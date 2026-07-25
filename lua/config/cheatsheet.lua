@@ -42,6 +42,15 @@ local bindings = {
     { "<leader>sr", "Open Spectre" },
     { "<leader>sw", "Search word under cursor" },
   }},
+  { "Snippets", {
+    { "<leader>ss", "List available snippets" },
+    { "rfc",       "React functional component" },
+    { "clg",       "console.log()" },
+    { "cfn",       "const name = () => {}" },
+    { "fn",        "function name() {}" },
+    { "afn",       "async function name() {}" },
+    { "cafn",      "const name = async () => {}" },
+  }},
 }
 
 return function()
