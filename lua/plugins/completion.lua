@@ -61,7 +61,6 @@ return {
     end
 
     -- ── SCSS class completions source ──
-    local scss_source = require("config.scss-completions")
 
     -- ── Finally, setup blink.cmp ──
     require("blink.cmp").setup({
@@ -73,7 +72,10 @@ return {
       sources = {
         default = { "lsp", "path", "snippets", "buffer", "scss-classes" },
         providers = {
-          ["scss-classes"] = scss_source.blink_source(),
+          ["scss-classes"] = {
+            name = "scss-classes",
+            module = "config.scss-completions",
+          },
         },
       },
       completion = {

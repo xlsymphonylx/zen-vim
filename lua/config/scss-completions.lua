@@ -62,7 +62,6 @@ local function parse_classes(filepath)
   local classes = {}
   local seen = {}
   local context = {}       -- stack: list of { name = "foo", indent = 2 }
-  local indent_map = {}    -- track which indent levels have open blocks
 
   local function resolve_ancestors()
     if #context == 0 then return "" end
@@ -77,12 +76,11 @@ local function parse_classes(filepath)
     local trimmed = line:match("^%s*(.*)$")
     if not trimmed or trimmed == "" then goto continue end
 
-    -- Calculate indentation level (2-space increments)
+    -- Calculate indentation level
     local leading = line:match("^(%s*)")
     local indent = leading and #leading or 0
 
-    -- Close blocks that are at or deeper than current indent
-    -- When we see a `}` or a new selector at the same or lesser indent, pop
+    -- Close blocks at or deeper than current indent
     if trimmed:find("^}") then
       local pop_indent = nil
       for i = #context, 1, -1 do
@@ -98,18 +96,11 @@ local function parse_classes(filepath)
       goto continue
     end
 
-    -- Check for class definitions
-    -- 1. Root-level: .foo {
-    -- 2. Nested with &: .parent { &--child { } }
-    -- 3. Nested without &: .parent { .child { } } (compound - we skip these for single-class completion)
-
     local root_class = trimmed:match("^%.([%w_%-]+)")
     local amp_class = trimmed:match("^&([%w_%-]+)")
 
     if root_class then
-      -- If we're at indent 0, this is a root class
       if indent == 0 then
-        -- Close any remaining context
         context = {}
         table.insert(context, { name = root_class, indent = indent })
         if not seen[root_class] then
@@ -117,11 +108,8 @@ local function parse_classes(filepath)
           table.insert(classes, root_class)
         end
       elseif #context > 0 then
-        -- Nested class without & → .parent .child (compound selector)
-        -- Skip for single-class completion but track context
         table.insert(context, { name = root_class, indent = indent })
       else
-        -- orphan, treat as root
         table.insert(context, { name = root_class, indent = indent })
         if not seen[root_class] then
           seen[root_class] = true
@@ -129,13 +117,11 @@ local function parse_classes(filepath)
         end
       end
     elseif amp_class then
-      -- BEM-style & nesting: .parent { &--child {} } → "parent--child"
       local resolved = resolve_ancestors() .. amp_class
       if not seen[resolved] then
         seen[resolved] = true
         table.insert(classes, resolved)
       end
-      -- Push context for deeper nesting
       table.insert(context, { name = amp_class, indent = indent })
     end
 
@@ -181,49 +167,43 @@ function M.get_classes(project_root)
   return class_list
 end
 
---- Force refresh the cache
-function M.refresh()
-  cache = {}
-end
+--- blink.cmp source definition
+--- The module returns this table as a blink.cmp source
+local source = {
+  name = "scss-classes",
 
---- blink.cmp source integration
---- Returns a blink.cmp source definition
-function M.blink_source()
-  local source = {
-    name = "scss-classes",
+  -- Expose refresh for the <leader>sc keybind
+  refresh = function()
+    cache = {}
+  end,
 
-    -- Only activate in relevant filetypes
-    enabled = function(ctx)
-      return M.should_complete(ctx.filetype)
-    end,
+  enabled = function(ctx)
+    return M.should_complete(ctx.filetype)
+  end,
 
-    -- Return completions
-    get_completions = function(ctx, callback)
-      local project_root = vim.fn.getcwd()
-      local classes = M.get_classes(project_root)
-      if #classes == 0 then
-        callback({})
-        return
-      end
+  get_completions = function(ctx, callback)
+    local project_root = vim.fn.getcwd()
+    local classes = M.get_classes(project_root)
+    if #classes == 0 then
+      callback({})
+      return
+    end
 
-      local items = {}
-      for _, cls in ipairs(classes) do
-        table.insert(items, {
-          label = cls,
-          kind = require("blink.cmp.types").CompletionItemKind.Value,
-          detail = "(SCSS class)",
-        })
-      end
-
-      callback({
-        items = items,
-        is_incomplete_forward = false,
-        is_incomplete_backward = false,
+    local items = {}
+    for _, cls in ipairs(classes) do
+      table.insert(items, {
+        label = cls,
+        kind = 15, -- Value
+        detail = "(SCSS class)",
       })
-    end,
-  }
+    end
 
-  return source
-end
+    callback({
+      items = items,
+      is_incomplete_forward = false,
+      is_incomplete_backward = false,
+    })
+  end,
+}
 
-return M
+return source
