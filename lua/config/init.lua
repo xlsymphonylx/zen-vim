@@ -19,7 +19,7 @@ end, { desc = "Refresh SCSS class cache" })
 vim.keymap.set("n", "<leader>ld", function()
   require("telescope.builtin").diagnostics({
     attach_mappings = function(_, map)
-      map("i", "i", function(prompt_bufnr)
+      map("i", "<M-i>", function(prompt_bufnr)
         local entry = require("telescope.actions.state").get_selected_entry()
         if not entry then return end
         local bufnr = entry.bufnr or vim.fn.bufnr(entry.filename, false)
@@ -28,4 +28,4 @@ vim.keymap.set("n", "<leader>ld", function()
       return true
     end,
   })
-end, { desc = "Diagnostics (i = inspect full error)" })
+end, { desc = "Diagnostics (M-i = inspect full error)" })
