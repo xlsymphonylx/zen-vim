@@ -29,31 +29,13 @@ return {
       dashboard.button("r", "    Recent files", ":Telescope oldfiles<CR>"),
       dashboard.button("e", "    File tree", ":Neotree toggle<CR>"),
       dashboard.button("t", "    Terminal", ":ToggleTerm direction=horizontal<CR>"),
+      dashboard.button("?", "    Keybinds", ":lua require('config.cheatsheet')()<CR>"),
       dashboard.button("q", "    Quit", ":qa<CR>"),
     }
 
     -- ── Footer ──
     local v = vim.version()
     dashboard.section.footer.val = "  v" .. v.major .. "." .. v.minor .. "." .. v.patch
-
-    -- ── Quick reference ──
-    dashboard.section.quick_ref = {
-      type = "text",
-      val = {
-        "",
-        "  Quick reference",
-        "  ─────────────────────────────────────────────",
-        "    <leader>ff  Find files      <leader>e   File tree",
-        "    <leader>fg  Live grep       <leader>bd  Delete buffer",
-        "    <leader>th  Terminal (horiz)  <leader>tv  Terminal (vert)",
-        "    <leader>gg  Lazygit         Alt+w/a/s/d  Window nav",
-        "    <leader>?   Full cheatsheet",
-      },
-      opts = {
-        position = "center",
-        hl = "Comment",
-      },
-    }
 
     -- ── Override theme layout for tight spacing ──
     -- Default has padding:2 + global margin:5 — we gut that
@@ -63,7 +45,6 @@ return {
       dashboard.section.header,
       { type = "padding", val = 1 },
       dashboard.section.buttons,
-      dashboard.section.quick_ref,
       dashboard.section.footer,
       { type = "padding", val = 1 },
     }
