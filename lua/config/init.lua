@@ -15,14 +15,17 @@ vim.keymap.set("n", "<leader>sc", function()
   vim.notify("SCSS class cache refreshed", vim.log.levels.INFO)
 end, { desc = "Refresh SCSS class cache" })
 
--- Toggle diagnostics in location list (full messages, no truncation)
+-- Diagnostics via Telescope, press i to inspect full error in float
 vim.keymap.set("n", "<leader>ld", function()
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local info = vim.fn.getwininfo(win)
-    if #info > 0 and info[1].loclist == 1 then
-      vim.cmd("lclose")
-      return
-    end
-  end
-  vim.diagnostic.setloclist({ open = true })
-end, { desc = "Toggle diagnostics list" })
+  require("telescope.builtin").diagnostics({
+    attach_mappings = function(_, map)
+      map("i", "i", function(prompt_bufnr)
+        local entry = require("telescope.actions.state").get_selected_entry()
+        if not entry then return end
+        local bufnr = entry.bufnr or vim.fn.bufnr(entry.filename, false)
+        vim.diagnostic.open_float({ bufnr = bufnr, scope = "line", wrap = true })
+      end)
+      return true
+    end,
+  })
+end, { desc = "Diagnostics (i = inspect full error)" })
