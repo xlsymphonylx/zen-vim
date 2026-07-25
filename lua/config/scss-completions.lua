@@ -1,18 +1,24 @@
---- Custom blink.cmp source that scans SCSS/CSS files for class names
---- and provides completions when editing JSX/HTML.
+--- Custom blink.cmp source that scans SCSS/CSS/JSX files for class names
+--- and provides completions when editing JSX/HTML or SCSS/CSS.
 --- Handles BEM-style SCSS nesting: .foo { &--bar {} } → "foo--bar"
+--- Handles JSX: className="foo bar" → "foo", "bar"
 
 local cache = {}
 local cache_ttl = 5
 
---- Find all CSS/SCSS files in the project (node_modules / .git excluded)
-local function find_css_files(project_root)
+--- Find all CSS/SCSS/JSX/TSX files in the project (node_modules / .git excluded)
+local function find_project_files(project_root)
   if not project_root or project_root == "" then return {} end
 
   local ok, result = pcall(vim.fn.system, {
     "find", project_root,
     "-type", "f",
-    "(", "-name", "*.css", "-o", "-name", "*.scss", ")",
+    "(",
+      "-name", "*.css", "-o",
+      "-name", "*.scss", "-o",
+      "-name", "*.jsx", "-o",
+      "-name", "*.tsx",
+    ")",
     "!", "-path", "*/node_modules/*",
     "!", "-path", "*/.git/*",
     "!", "-path", "*/dist/*",
@@ -32,7 +38,7 @@ local function find_css_files(project_root)
 end
 
 --- Parse SCSS class names from a file, handling BEM-style & nesting.
-local function parse_classes(filepath)
+local function parse_scss_classes(filepath)
   local lines = vim.fn.readfile(filepath)
   if not lines or #lines == 0 then return {} end
 
@@ -100,7 +106,41 @@ local function parse_classes(filepath)
   return classes
 end
 
---- Get all class names from the project, using cache
+--- Parse JSX/TSX class names from className="..." attributes.
+--- Handles double quotes, single quotes, and template literals.
+local function parse_jsx_classes(filepath)
+  local content = vim.fn.readfile(filepath)
+  if not content or #content == 0 then return {} end
+
+  local text = table.concat(content, "\n")
+  local classes = {}
+  local seen = {}
+
+  -- Match className="foo bar"
+  for val in text:gmatch('className="([^"]*)"') do
+    for cls in val:gmatch("[%w_%-]+") do
+      if not seen[cls] then seen[cls] = true; table.insert(classes, cls) end
+    end
+  end
+
+  -- Match className='foo bar'
+  for val in text:gmatch("className='([^']*)'") do
+    for cls in val:gmatch("[%w_%-]+") do
+      if not seen[cls] then seen[cls] = true; table.insert(classes, cls) end
+    end
+  end
+
+  -- Match className={`foo bar`} (template literals)
+  for val in text:gmatch("className[=]`([^`]*)`") do
+    for cls in val:gmatch("[%w_%-]+") do
+      if not seen[cls] then seen[cls] = true; table.insert(classes, cls) end
+    end
+  end
+
+  return classes
+end
+
+--- Get all class names from the project (SCSS + JSX), using cache
 local function get_classes(project_root)
   local now = vim.loop.now()
   local cached = cache[project_root]
@@ -109,11 +149,16 @@ local function get_classes(project_root)
     return cached.classes
   end
 
-  local files = find_css_files(project_root)
+  local files = find_project_files(project_root)
   local all_classes = {}
 
   for _, filepath in ipairs(files) do
-    local file_classes = parse_classes(filepath)
+    local file_classes
+    if filepath:match("%.jsx$") or filepath:match("%.tsx$") then
+      file_classes = parse_jsx_classes(filepath)
+    else
+      file_classes = parse_scss_classes(filepath)
+    end
     for _, cls in ipairs(file_classes) do
       all_classes[cls] = true
     end
@@ -132,7 +177,7 @@ end
 -- Exposed for the <leader>sc keybind
 local source_refresh = function() cache = {} end
 
---- blink.cmp source — proper class-like pattern from built-in sources
+--- blink.cmp source
 local Source = {}
 
 function Source.new(_, _config)
@@ -157,14 +202,13 @@ function Source:get_completions(context, resolve)
     table.insert(items, {
       label = cls,
       kind = 15, -- Value
-      detail = "(SCSS class)",
+      detail = "(CSS class)",
     })
   end
 
   resolve({ items = items, is_incomplete_forward = false, is_incomplete_backward = false })
 end
 
--- Also expose refresh so <leader>sc can call it
 Source.refresh = source_refresh
 
 return Source
