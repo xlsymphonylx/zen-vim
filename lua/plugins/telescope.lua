@@ -12,17 +12,18 @@ return {
     { "<leader>fc", "<cmd>Telescope colorscheme<CR>", desc = "Colorschemes" },
   },
   config = function()
-    -- Polyfill ft_to_lang for telescope treesitter previewer compatibility
+    -- Pre-load stub for nvim-treesitter.configs (require fails on this nvim version)
+    -- Telescope checks this module for preview highlighting, so it must exist
+    package.loaded["nvim-treesitter.configs"] = {
+      is_enabled = function() return false end,
+    }
+    -- Also add ft_to_lang to parsers if missing
     local ok, parsers = pcall(require, "nvim-treesitter.parsers")
     if ok and parsers and not parsers.ft_to_lang then
       parsers.ft_to_lang = function(ft)
         local lang = vim.treesitter.language.get_lang(ft)
         return lang or ft
       end
-    end
-    local ok2, configs = pcall(require, "nvim-treesitter.configs")
-    if ok2 and configs and not configs.is_enabled then
-      configs.is_enabled = function() return false end
     end
 
     require("telescope").setup({
