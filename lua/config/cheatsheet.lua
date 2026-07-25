@@ -36,7 +36,10 @@ local bindings = {
     { "K",   "Hover info" },
     { "<leader>rn", "Rename" },
     { "<leader>ca", "Code action" },
-    { "<leader>d",  "Diagnostic float" },
+    { "<leader>d",  "Diagnostic float (current line)" },
+    { "<leader>ld", "List all diagnostics" },
+    { "]d",  "Next diagnostic" },
+    { "[d",  "Previous diagnostic" },
   }},
   { "Search & Replace", {
     { "<leader>sr", "Open Spectre" },
