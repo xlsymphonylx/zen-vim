@@ -24,7 +24,7 @@ return {
       position = "left",
       width = 30,
       mappings = {
-        ["<CR>"] = "open",
+        ["<CR>"] = "open_tabnew",
         ["<C-v>"] = "open_vsplit",
         ["<C-s>"] = "open_split",
         ["<C-t>"] = "open_tabnew",
