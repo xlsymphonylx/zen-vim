@@ -25,8 +25,8 @@ return {
       width = 30,
       mappings = {
         ["<space>"] = { "toggle_node", nowait = false },
-        ["<2-LeftMouse>"] = "open_tabnew",
-        ["<cr>"] = "open_tabnew",
+        ["<2-LeftMouse>"] = "open",
+        ["<cr>"] = "open",
         ["<esc>"] = "cancel",
         ["P"] = { "toggle_preview", config = { use_float = true } },
         ["l"] = "focus_preview",
@@ -59,4 +59,13 @@ return {
       indent = { padding = 1 },
     },
   },
+  config = function(_, opts)
+    require("neo-tree").setup(opts)
+    -- Show neo-tree in every new tab so "open_tabnew" keeps the sidebar
+    vim.api.nvim_create_autocmd("TabNewEntered", {
+      callback = function()
+        vim.cmd("Neotree show")
+      end,
+    })
+  end,
 }
