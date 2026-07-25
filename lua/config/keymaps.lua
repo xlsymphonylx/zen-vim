@@ -16,11 +16,6 @@ map("n", "<C-Down>", ":resize +2<CR>", opts)
 map("n", "<C-Left>", ":vertical resize -2<CR>", opts)
 map("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 
--- ===== Buffers (open files) =====
-map("n", "<leader><Right>", ":bnext<CR>", opts)
-map("n", "<leader><Left>", ":bprevious<CR>", opts)
-map("n", "<leader>bd", ":bdelete<CR>", opts)
-
 -- ===== Line movement =====
 map("n", "<A-j>", ":m .+1<CR>==", opts)
 map("n", "<A-k>", ":m .-2<CR>==", opts)

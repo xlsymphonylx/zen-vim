@@ -10,10 +10,7 @@ local bindings = {
     { "<leader>fb",  "Buffers list" },
     { "<leader>fc",  "Colorschemes" },
   }},
-  { "Buffer / Tab", {
-    { "<leader>bd",  "Delete buffer" },
-    { "<leader><Right>", "Next buffer" },
-    { "<leader><Left>",  "Previous buffer" },
+  { "Tab", {
     { "A-S-a", "Previous tab" },
     { "A-S-d", "Next tab" },
     { "A-S-n", "New empty tab" },
