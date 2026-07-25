@@ -70,8 +70,8 @@ local bindings = {
     { "cafn",      "const name = async () => {}" },
   }},
   { "CSS Classes", {
-    { "<leader>sc", "Refresh SCSS class cache" },
-    { "(auto)",    "SCSS classes suggested in JSX/HTML" },
+    { "<leader>sc", "Refresh cache" },
+    { "(auto)",    "SCSS <-> JSX bidirectional suggestions" },
   }},
 }
 
