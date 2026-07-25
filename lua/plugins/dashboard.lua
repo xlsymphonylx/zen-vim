@@ -41,12 +41,11 @@ return {
     -- Default has padding:2 + global margin:5 — we gut that
     dashboard.config.opts.margin = 0
     dashboard.config.layout = {
-      { type = "padding", val = 1 },
       dashboard.section.header,
       { type = "padding", val = 1 },
       dashboard.section.buttons,
       dashboard.section.footer,
-      { type = "padding", val = 1 },
+      { type = "padding", val = 2 },
     }
 
     alpha.setup(dashboard.config)
