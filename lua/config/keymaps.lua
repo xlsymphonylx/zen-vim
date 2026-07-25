@@ -35,6 +35,7 @@ map("x", "p", '"_dP', opts)
 map("n", "J", "mzJ`z", opts)
 
 -- ===== Tab navigation =====
-map("n", "<leader>bn", "<cmd>tabnext<CR>", opts)
-map("n", "<leader>bp", "<cmd>tabprevious<CR>", opts)
-map("n", "<leader>bo", "<cmd>tabnew %<CR>", opts)
+map("n", "<A-S-a>", "<cmd>tabprevious<CR>", { desc = "Previous tab" })
+map("n", "<A-S-d>", "<cmd>tabnext<CR>", { desc = "Next tab" })
+map("n", "<A-S-n>", "<cmd>tabnew<CR>", { desc = "New empty tab" })
+map("n", "<A-S-q>", "<cmd>tabclose<CR>", { desc = "Close tab" })

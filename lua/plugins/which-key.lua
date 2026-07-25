@@ -5,7 +5,7 @@ return {
 		preset = "modern",
 		defaults = {
 			mode = { "n", "v" },
-			["<leader>b"] = { name = "Buffer + Tab" },
+			["<leader>b"] = { name = "Buffer" },
 			["<leader>f"] = { name = "Find" },
 			["<leader>g"] = { name = "Git" },
 			["<leader>h"] = { name = "Hunk" },

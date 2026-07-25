@@ -14,9 +14,10 @@ local bindings = {
     { "<leader>bd",  "Delete buffer" },
     { "<leader><Right>", "Next buffer" },
     { "<leader><Left>",  "Previous buffer" },
-    { "<leader>bn", "Next tab" },
-    { "<leader>bp", "Previous tab" },
-    { "<leader>bo", "Open current file in new tab" },
+    { "A-S-a", "Previous tab" },
+    { "A-S-d", "Next tab" },
+    { "A-S-n", "New empty tab" },
+    { "A-S-q", "Close tab" },
   }},
   { "Terminal", {
     { "<leader>th",  "Toggle horizontal terminal" },
