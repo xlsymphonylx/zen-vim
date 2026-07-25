@@ -177,10 +177,24 @@ end
 -- Exposed for the <leader>sc keybind
 local source_refresh = function() cache = {} end
 
+-- Auto-refresh cache when entering insert mode
+-- Next completion will pick up newly added classes from JSX/SCSS
+local autocmd_setup = false
+local function ensure_autocmd()
+  if autocmd_setup then return end
+  autocmd_setup = true
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    callback = function()
+      cache = {}
+    end,
+  })
+end
+
 --- blink.cmp source
 local Source = {}
 
 function Source.new(_, _config)
+  ensure_autocmd()
   return setmetatable({}, { __index = Source })
 end
 
