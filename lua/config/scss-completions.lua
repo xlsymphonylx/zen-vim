@@ -207,9 +207,60 @@ function Source:enabled()
     or ft == "scss"
 end
 
+--- Detect current SCSS nesting context by scanning backwards from cursor
+local function get_scss_context()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row = cursor[1] - 1
+  local lines = vim.api.nvim_buf_get_lines(0, 0, row, false)
+  local context = {}
+
+  for _, line in ipairs(lines) do
+    local trimmed = line:match("^%s*(.-)%s*$")
+    if not trimmed or trimmed == "" then goto next end
+
+    local indent = #(line:match("^(%s*)") or "")
+
+    if trimmed:find("^}") then
+      -- Pop the last context entry at or above this indent
+      for i = #context, 1, -1 do
+        if context[i].indent >= indent then
+          table.remove(context, i)
+        end
+      end
+    else
+      -- Check if this line starts a block with a class
+      local class = trimmed:match("^%.([%w_%-]+)%s*{")
+      -- Also match BEM: .parent { &--child { ... } }
+      if not class then
+        class = trimmed:match("^&([%w_%-]+)%s*{")
+        if class and #context > 0 then
+          class = context[#context].name .. class
+          -- Push with indent so we can pop later
+          table.insert(context, { name = class, indent = indent })
+          goto next
+        end
+      end
+      if class then
+        table.insert(context, { name = class, indent = indent })
+      end
+    end
+
+    ::next::
+  end
+
+  if #context == 0 then return nil end
+  return context[#context].name
+end
+
 function Source:get_completions(context, resolve)
   local project_root = vim.fn.getcwd()
   local classes = get_classes(project_root)
+
+  -- Detect SCSS context for & completions
+  local scss_ctx = nil
+  if vim.bo.filetype == "scss" then
+    scss_ctx = get_scss_context()
+  end
 
   local items = {}
   for _, cls in ipairs(classes) do
@@ -218,6 +269,18 @@ function Source:get_completions(context, resolve)
       kind = 15, -- Value
       detail = "(CSS class)",
     })
+
+    -- If inside a SCSS context, also add & variants for matching classes
+    if scss_ctx then
+      local suffix = cls:match("^" .. scss_ctx .. "([%_%-].+)$")
+      if suffix then
+        table.insert(items, {
+          label = "&" .. suffix,
+          kind = 15,
+          detail = "(SCSS & shorthand)",
+        })
+      end
+    end
   end
 
   resolve({ items = items, is_incomplete_forward = false, is_incomplete_backward = false })
