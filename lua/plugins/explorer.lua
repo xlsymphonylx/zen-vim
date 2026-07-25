@@ -27,17 +27,12 @@ return {
         ["<CR>"] = "open",
         ["<C-v>"] = "open_vsplit",
         ["<C-s>"] = "open_split",
-        ["<C-t>"] = "open_tab",
+        ["<C-t>"] = "open_tabnew",
         ["."] = "toggle_hidden",
       },
     },
     default_component_configs = {
       indent = { padding = 1 },
-      icon = {
-        folder_closed = " ",
-        folder_open = " ",
-        folder_empty = " ",
-      },
     },
   },
 }

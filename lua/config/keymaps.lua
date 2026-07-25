@@ -33,3 +33,8 @@ map("x", "p", '"_dP', opts)
 
 -- ===== Search =====
 map("n", "J", "mzJ`z", opts)
+
+-- ===== Tab navigation =====
+map("n", "<leader>bn", "<cmd>tabnext<CR>", opts)
+map("n", "<leader>bp", "<cmd>tabprevious<CR>", opts)
+map("n", "<leader>bo", "<cmd>tabnew %<CR>", opts)

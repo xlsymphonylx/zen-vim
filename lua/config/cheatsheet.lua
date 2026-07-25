@@ -10,10 +10,13 @@ local bindings = {
     { "<leader>fb",  "Buffers list" },
     { "<leader>fc",  "Colorschemes" },
   }},
-  { "Buffer", {
+  { "Buffer / Tab", {
     { "<leader>bd",  "Delete buffer" },
     { "<leader><Right>", "Next buffer" },
     { "<leader><Left>",  "Previous buffer" },
+    { "<leader>bn", "Next tab" },
+    { "<leader>bp", "Previous tab" },
+    { "<leader>bo", "Open current file in new tab" },
   }},
   { "Terminal", {
     { "<leader>th",  "Toggle horizontal terminal" },
