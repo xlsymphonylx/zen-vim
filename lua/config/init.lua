@@ -15,17 +15,17 @@ vim.keymap.set("n", "<leader>sc", function()
   vim.notify("SCSS class cache refreshed", vim.log.levels.INFO)
 end, { desc = "Refresh SCSS class cache" })
 
--- Diagnostics via Telescope, press i to inspect full error in float
+-- Diagnostics via Telescope, Enter jumps AND shows full error in float
 vim.keymap.set("n", "<leader>ld", function()
   require("telescope.builtin").diagnostics({
     attach_mappings = function(_, map)
-      map("i", "<M-i>", function(prompt_bufnr)
-        local entry = require("telescope.actions.state").get_selected_entry()
-        if not entry then return end
-        local bufnr = entry.bufnr or vim.fn.bufnr(entry.filename, false)
-        vim.diagnostic.open_float({ bufnr = bufnr, scope = "line", wrap = true })
+      map("i", "<CR>", function(prompt_bufnr)
+        require("telescope.actions").select_default(prompt_bufnr)
+        vim.schedule(function()
+          vim.diagnostic.open_float({ scope = "cursor", wrap = true })
+        end)
       end)
       return true
     end,
   })
-end, { desc = "Diagnostics (M-i = inspect full error)" })
+end, { desc = "List all diagnostics" })
