@@ -60,6 +60,9 @@ return {
       ls.add_snippets(ft, custom_js)
     end
 
+    -- ── SCSS class completions source ──
+    local scss_source = require("config.scss-completions")
+
     -- ── Finally, setup blink.cmp ──
     require("blink.cmp").setup({
       keymap = {
@@ -68,7 +71,10 @@ return {
         ["<C-e>"] = { "cancel" },
       },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer", "scss-classes" },
+        providers = {
+          ["scss-classes"] = scss_source.blink_source(),
+        },
       },
       completion = {
         documentation = { auto_show = true },

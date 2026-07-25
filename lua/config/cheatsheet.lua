@@ -51,6 +51,11 @@ local bindings = {
     { "afn",       "async function name() {}" },
     { "cafn",      "const name = async () => {}" },
   }},
+  { "CSS Classes", {
+    { "<leader>sc", "Refresh SCSS class cache" },
+    { "(auto)",    "SCSS classes in JSX/HTML completions" },
+    { "(auto)",    "JSX classes in SCSS completions" },
+  }},
 }
 
 return function()

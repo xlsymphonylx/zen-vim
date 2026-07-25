@@ -8,3 +8,9 @@ vim.keymap.set("n", "<leader>?", require("config.cheatsheet"), { desc = "Open ke
 
 -- Snippets: <leader>ss lists all available snippets for current filetype
 vim.keymap.set("n", "<leader>ss", "<cmd>Ls<CR>", { desc = "List available snippets" })
+
+-- Refresh SCSS class completion cache
+vim.keymap.set("n", "<leader>sc", function()
+  require("config.scss-completions").refresh()
+  vim.notify("SCSS class cache refreshed", vim.log.levels.INFO)
+end, { desc = "Refresh SCSS class cache" })
