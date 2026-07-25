@@ -30,8 +30,8 @@ return {
         ["<esc>"] = "cancel",
         ["P"] = { "toggle_preview", config = { use_float = true } },
         ["l"] = "focus_preview",
-        ["S"] = "open_split",
-        ["s"] = "open_vsplit",
+        ["h"] = "open_split",
+        ["v"] = "open_vsplit",
         ["t"] = "open_tabnew",
         ["w"] = "open_with_window_picker",
         ["C"] = "close_node",
@@ -52,6 +52,7 @@ return {
         ["<"] = "prev_source",
         [">"] = "next_source",
         ["."] = "toggle_hidden",
+        ["~"] = "toggle_hidden",
       },
     },
     default_component_configs = {
