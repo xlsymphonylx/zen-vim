@@ -167,43 +167,51 @@ function M.get_classes(project_root)
   return class_list
 end
 
+--- Force refresh the cache
+function M.refresh()
+  cache = {}
+end
+
 --- blink.cmp source definition
---- The module returns this table as a blink.cmp source
-local source = {
-  name = "scss-classes",
+--- The module exports a new() constructor as blink.cmp expects
+function M.new(_opts, _config)
+  local source = {
+    name = "scss-classes",
 
-  -- Expose refresh for the <leader>sc keybind
-  refresh = function()
-    cache = {}
-  end,
+    refresh = function()
+      cache = {}
+    end,
 
-  enabled = function(ctx)
-    return M.should_complete(ctx.filetype)
-  end,
+    enabled = function(ctx)
+      return M.should_complete(ctx.filetype)
+    end,
 
-  get_completions = function(ctx, callback)
-    local project_root = vim.fn.getcwd()
-    local classes = M.get_classes(project_root)
-    if #classes == 0 then
-      callback({})
-      return
-    end
+    get_completions = function(ctx, callback)
+      local project_root = vim.fn.getcwd()
+      local classes = M.get_classes(project_root)
+      if #classes == 0 then
+        callback({})
+        return
+      end
 
-    local items = {}
-    for _, cls in ipairs(classes) do
-      table.insert(items, {
-        label = cls,
-        kind = 15, -- Value
-        detail = "(SCSS class)",
+      local items = {}
+      for _, cls in ipairs(classes) do
+        table.insert(items, {
+          label = cls,
+          kind = 15, -- Value
+          detail = "(SCSS class)",
+        })
+      end
+
+      callback({
+        items = items,
+        is_incomplete_forward = false,
+        is_incomplete_backward = false,
       })
-    end
+    end,
+  }
 
-    callback({
-      items = items,
-      is_incomplete_forward = false,
-      is_incomplete_backward = false,
-    })
-  end,
-}
+  return source
+end
 
-return source
+return M
