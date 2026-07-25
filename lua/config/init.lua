@@ -33,8 +33,12 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "qf",
   callback = function()
     vim.keymap.set("n", "<CR>", function()
-      vim.cmd(".ll")
-      vim.diagnostic.open_float({ scope = "line", wrap = true })
-    end, { buffer = true, silent = true, desc = "Jump and show diagnostic" })
+      -- Jump to the error location (close loclist, open file at line/col)
+      vim.cmd("close | ll")
+      -- Show the float after jumping
+      vim.schedule(function()
+        vim.diagnostic.open_float({ scope = "cursor", wrap = true })
+      end)
+    end, { buffer = true, silent = true, desc = "Jump and show diagnostic float" })
   end,
 })
