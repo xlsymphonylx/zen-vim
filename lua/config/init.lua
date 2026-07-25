@@ -15,7 +15,7 @@ vim.keymap.set("n", "<leader>sc", function()
   vim.notify("SCSS class cache refreshed", vim.log.levels.INFO)
 end, { desc = "Refresh SCSS class cache" })
 
--- List all LSP diagnostics via Telescope
+-- List all LSP diagnostics in a readable location list window
 vim.keymap.set("n", "<leader>ld", function()
-  require("telescope.builtin").diagnostics()
+  vim.diagnostic.setloclist({ open = true })
 end, { desc = "List all diagnostics" })
