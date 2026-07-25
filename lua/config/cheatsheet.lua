@@ -5,6 +5,20 @@ local bindings = {
     { "<leader>fr",  "Recent files" },
     { "<leader>w",   "Save file" },
   }},
+  { "File Tree (neo-tree)", {
+    { "Enter / t", "Open in new tab" },
+    { "h",         "Open in horizontal split" },
+    { "v",         "Open in vertical split" },
+    { ". / ~",     "Toggle hidden files" },
+    { "y",         "Copy file to clipboard" },
+    { "x",         "Cut file to clipboard" },
+    { "p",         "Paste from clipboard" },
+    { "a",         "Add file" },
+    { "d",         "Delete file" },
+    { "r",         "Rename" },
+    { "q",         "Close tree" },
+    { "?",         "Show all keybinds" },
+  }},
   { "Search", {
     { "<leader>fg",  "Live grep (keyword)" },
     { "<leader>fb",  "Buffers list" },
@@ -57,8 +71,7 @@ local bindings = {
   }},
   { "CSS Classes", {
     { "<leader>sc", "Refresh SCSS class cache" },
-    { "(auto)",    "SCSS classes in JSX/HTML completions" },
-    { "(auto)",    "JSX classes in SCSS completions" },
+    { "(auto)",    "SCSS classes suggested in JSX/HTML" },
   }},
 }
 
