@@ -33,8 +33,8 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "qf",
   callback = function()
     vim.keymap.set("n", "<CR>", function()
-      vim.cmd(".cc")
-      vim.diagnostic.open_float({ scope = "line" })
+      vim.cmd(".ll")
+      vim.diagnostic.open_float({ scope = "line", wrap = true })
     end, { buffer = true, silent = true, desc = "Jump and show diagnostic" })
   end,
 })
