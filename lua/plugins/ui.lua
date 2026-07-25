@@ -1,10 +1,10 @@
 return {
   "nvim-lualine/lualine.nvim",
-  dependencies = { "nvim-tree/nvim-web-devicons", "tokyonight" },
+  dependencies = { "nvim-tree/nvim-web-devicons" },
   event = "VeryLazy",
   opts = {
     options = {
-      theme = "tokyonight",
+      theme = "auto",
       component_separators = { left = "", right = "" },
       section_separators = { left = "", right = "" },
       globalstatus = true,
