@@ -2,44 +2,24 @@
 --- and provides completions when editing JSX/HTML.
 --- Handles BEM-style SCSS nesting: .foo { &--bar {} } → "foo--bar"
 
-local M = {}
-
--- Cache: file mtime -> { classes = {string}, cache_time = number }
 local cache = {}
-local cache_ttl = 5 -- seconds before re-scanning
-
---- Check if a given filetype is one we should complete in
-function M.should_complete(filetype)
-  return filetype == "javascriptreact"
-    or filetype == "typescriptreact"
-    or filetype == "html"
-    or filetype == "css"
-    or filetype == "scss"
-end
+local cache_ttl = 5
 
 --- Find all CSS/SCSS files in the project (node_modules / .git excluded)
 local function find_css_files(project_root)
-  if not project_root or project_root == "" then
-    return {}
-  end
+  if not project_root or project_root == "" then return {} end
 
-  local find_cmd = {
+  local ok, result = pcall(vim.fn.system, {
     "find", project_root,
     "-type", "f",
-    "\\(", "-name", "*.css", "-o", "-name", "*.scss", "\\",
+    "(", "-name", "*.css", "-o", "-name", "*.scss", ")",
     "!", "-path", "*/node_modules/*",
     "!", "-path", "*/.git/*",
     "!", "-path", "*/dist/*",
     "!", "-path", "*/build/*",
-    "\\)",
-  }
+  })
+  if not ok or result == "" then return {} end
 
-  local ok, result = pcall(vim.fn.system, table.concat(find_cmd, " "))
-  if not ok or result == "" then
-    return {}
-  end
-
-  -- Filter to only files that exist
   local files = vim.split(result, "\n", { trimempty = true })
   local valid = {}
   for _, f in ipairs(files) do
@@ -52,16 +32,13 @@ local function find_css_files(project_root)
 end
 
 --- Parse SCSS class names from a file, handling BEM-style & nesting.
---- Returns a set of unique class names (without the leading dot).
 local function parse_classes(filepath)
   local lines = vim.fn.readfile(filepath)
-  if not lines or #lines == 0 then
-    return {}
-  end
+  if not lines or #lines == 0 then return {} end
 
   local classes = {}
   local seen = {}
-  local context = {}       -- stack: list of { name = "foo", indent = 2 }
+  local context = {}
 
   local function resolve_ancestors()
     if #context == 0 then return "" end
@@ -76,23 +53,15 @@ local function parse_classes(filepath)
     local trimmed = line:match("^%s*(.*)$")
     if not trimmed or trimmed == "" then goto continue end
 
-    -- Calculate indentation level
     local leading = line:match("^(%s*)")
     local indent = leading and #leading or 0
 
-    -- Close blocks at or deeper than current indent
     if trimmed:find("^}") then
-      local pop_indent = nil
+      local pop_at = nil
       for i = #context, 1, -1 do
-        if context[i].indent >= indent then
-          pop_indent = i
-        end
+        if context[i].indent >= indent then pop_at = i end
       end
-      if pop_indent then
-        for _ = pop_indent, #context do
-          table.remove(context)
-        end
-      end
+      if pop_at then for _ = pop_at, #context do table.remove(context) end end
       goto continue
     end
 
@@ -132,11 +101,10 @@ local function parse_classes(filepath)
 end
 
 --- Get all class names from the project, using cache
-function M.get_classes(project_root)
+local function get_classes(project_root)
   local now = vim.loop.now()
   local cached = cache[project_root]
 
-  -- Return cache if still fresh
   if cached and (now - cached.cache_time) < cache_ttl then
     return cached.classes
   end
@@ -151,67 +119,52 @@ function M.get_classes(project_root)
     end
   end
 
-  -- Convert to sorted list
   local class_list = {}
   for cls, _ in pairs(all_classes) do
     table.insert(class_list, cls)
   end
   table.sort(class_list)
 
-  -- Cache it
-  cache[project_root] = {
-    classes = class_list,
-    cache_time = now,
-  }
-
+  cache[project_root] = { classes = class_list, cache_time = now }
   return class_list
 end
 
---- Force refresh the cache
-function M.refresh()
-  cache = {}
+-- Exposed for the <leader>sc keybind
+local source_refresh = function() cache = {} end
+
+--- blink.cmp source — proper class-like pattern from built-in sources
+local Source = {}
+
+function Source.new(_, _config)
+  return setmetatable({}, { __index = Source })
 end
 
---- blink.cmp source definition
---- The module exports a new() constructor as blink.cmp expects
-function M.new(_opts, _config)
-  local source = {
-    name = "scss-classes",
-
-    refresh = function()
-      cache = {}
-    end,
-
-    enabled = function(ctx)
-      return M.should_complete(ctx.filetype)
-    end,
-
-    get_completions = function(ctx, callback)
-      local project_root = vim.fn.getcwd()
-      local classes = M.get_classes(project_root)
-      if #classes == 0 then
-        callback({})
-        return
-      end
-
-      local items = {}
-      for _, cls in ipairs(classes) do
-        table.insert(items, {
-          label = cls,
-          kind = 15, -- Value
-          detail = "(SCSS class)",
-        })
-      end
-
-      callback({
-        items = items,
-        is_incomplete_forward = false,
-        is_incomplete_backward = false,
-      })
-    end,
-  }
-
-  return source
+function Source:enabled()
+  local ft = vim.bo.filetype
+  return ft == "javascriptreact"
+    or ft == "typescriptreact"
+    or ft == "html"
+    or ft == "css"
+    or ft == "scss"
 end
 
-return M
+function Source:get_completions(context, resolve)
+  local project_root = vim.fn.getcwd()
+  local classes = get_classes(project_root)
+
+  local items = {}
+  for _, cls in ipairs(classes) do
+    table.insert(items, {
+      label = cls,
+      kind = 15, -- Value
+      detail = "(SCSS class)",
+    })
+  end
+
+  resolve({ items = items, is_incomplete_forward = false, is_incomplete_backward = false })
+end
+
+-- Also expose refresh so <leader>sc can call it
+Source.refresh = source_refresh
+
+return Source
