@@ -25,8 +25,8 @@ return {
       width = 30,
       mappings = {
         ["<space>"] = { "toggle_node", nowait = false },
-        ["<2-LeftMouse>"] = "open",
-        ["<cr>"] = "open",
+        ["<2-LeftMouse>"] = "open_tabnew",
+        ["<cr>"] = "open_tabnew",
         ["<esc>"] = "cancel",
         ["P"] = { "toggle_preview", config = { use_float = true } },
         ["l"] = "focus_preview",
