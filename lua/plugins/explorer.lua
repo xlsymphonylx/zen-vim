@@ -1,0 +1,54 @@
+return {
+  "nvim-neo-tree/neo-tree.nvim",
+  branch = "v3.x",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "nvim-tree/nvim-web-devicons",
+    "MunifTanjim/nui.nvim",
+  },
+  cmd = "Neotree",
+  keys = {
+    { "<leader>e", "<cmd>Neotree toggle<CR>", desc = "Toggle file tree" },
+  },
+  opts = {
+    filesystem = {
+      filtered_items = {
+        visible = true,
+        hide_dotfiles = false,
+        hide_gitignored = false,
+      },
+      follow_current_file = { enabled = true },
+      use_libuv_file_watcher = true,
+    },
+    window = {
+      position = "left",
+      width = 30,
+      mappings = {
+        ["<CR>"] = "open",
+        ["<C-v>"] = "open_vsplit",
+        ["<C-s>"] = "open_split",
+        ["<C-t>"] = "open_tab",
+        ["."] = "toggle_hidden",
+      },
+    },
+    default_component_configs = {
+      indent = { padding = 1 },
+      icon = {
+        folder_closed = " ",
+        folder_open = " ",
+        folder_empty = " ",
+      },
+    },
+  },
+  config = function(_, opts)
+    require("neo-tree").setup(opts)
+    -- Open on start if no file argument
+    vim.api.nvim_create_autocmd("VimEnter", {
+      callback = function()
+        if vim.fn.argc() == 0 then
+          vim.cmd("Neotree show")
+        end
+      end,
+    })
+  end,
+}

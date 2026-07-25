@@ -1,0 +1,26 @@
+# ── Nvim runtime artifacts ──────────────────────────────
+# These live in stdpath("data"), stdpath("state"), and
+# stdpath("cache") — NOT in the config dir. Listed here
+# as a safety net in case they ever appear.
+spell/
+*.log
+
+# ── Swap / backup / undo temp files ────────────────────
+*.swp
+*.swo
+*.swn
+*.swm
+*.bak
+*.bck
+*.bk
+*~
+\#*\#
+
+# ── OS junk ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Debug / repro ──────────────────────────────────────
+.repro/
+.debug/
