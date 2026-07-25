@@ -12,9 +12,21 @@ return {
     { "<leader>fc", "<cmd>Telescope colorscheme<CR>", desc = "Colorschemes" },
   },
   config = function()
+    -- Polyfill ft_to_lang for telescope treesitter previewer compatibility
+    local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+    if ok and parsers and not parsers.ft_to_lang then
+      parsers.ft_to_lang = function(ft)
+        local lang = vim.treesitter.language.get_lang(ft)
+        return lang or ft
+      end
+    end
+    local ok2, configs = pcall(require, "nvim-treesitter.configs")
+    if ok2 and configs and not configs.is_enabled then
+      configs.is_enabled = function() return false end
+    end
+
     require("telescope").setup({
       defaults = {
-        -- Use plain buffer previewer instead of treesitter to avoid ft_to_lang error
         file_previewer = require("telescope.previewers").vim_buffer_cat.new,
         grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
         qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
