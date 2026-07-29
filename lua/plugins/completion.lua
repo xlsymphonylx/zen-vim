@@ -7,7 +7,6 @@ return {
   },
   opts = {
     keymap = {
-      preset = "default",
       ["<C-y>"] = { "select_and_accept" },
       ["<C-e>"] = { "cancel" },
     },
@@ -65,7 +64,6 @@ return {
     -- ── Finally, setup blink.cmp ──
     require("blink.cmp").setup({
       keymap = {
-        preset = "default",
         ["<C-y>"] = { "select_and_accept" },
         ["<C-e>"] = { "cancel" },
       },

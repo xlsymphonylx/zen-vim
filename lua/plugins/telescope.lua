@@ -27,11 +27,25 @@ return {
       end
     end
 
+    local actions = require("telescope.actions")
+    local action_state = require("telescope.actions.state")
+
     require("telescope").setup({
       defaults = {
         file_previewer = require("telescope.previewers").vim_buffer_cat.new,
         grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
         qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
+        mappings = {
+          i = {
+            ["<CR>"] = function(prompt_bufnr)
+              local selection = action_state.get_selected_entry()
+              actions.close(prompt_bufnr)
+              if selection and selection.filename then
+                vim.cmd("tabedit " .. vim.fn.fnameescape(selection.filename))
+              end
+            end,
+          },
+        },
       },
     })
     local builtin = require("telescope.builtin")

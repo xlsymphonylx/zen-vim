@@ -48,7 +48,16 @@ return {
       jsonls = {},
       yamlls = {},
       bashls = {},
-      emmet_ls = {},
+      emmet_language_server = {
+        filetypes = { "html", "css", "scss", "javascriptreact", "typescriptreact" },
+        init_options = {
+          ---@type table<string, string>
+          ["emmet.includeLanguages"] = {
+            javascriptreact = "html",
+            typescriptreact = "html",
+          },
+        },
+      },
     }
 
     for server, config in pairs(servers) do

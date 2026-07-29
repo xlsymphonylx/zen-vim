@@ -33,6 +33,7 @@ local bindings = {
   { "Terminal", {
     { "<leader>th",  "Toggle horizontal terminal" },
     { "<leader>tv",  "Toggle vertical terminal" },
+    { "<leader>tt",  "Toggle floating terminal (persistent session)" },
     { "<leader>gg",  "Toggle lazygit (float)" },
   }},
   { "Git", {
@@ -72,6 +73,13 @@ local bindings = {
   { "CSS Classes", {
     { "<leader>sc", "Refresh cache" },
     { "(auto)",    "SCSS <-> JSX bidirectional suggestions" },
+  }},
+  { "Completion", {
+    { "<C-y>",  "Accept selected completion" },
+    { "<C-e>",  "Cancel / close menu" },
+    { "<C-n>",  "Next completion item" },
+    { "<C-p>",  "Previous completion item" },
+    { "(auto)", "Emmet abbreviation expansion (via LSP)" },
   }},
 }
 
