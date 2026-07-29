@@ -21,6 +21,26 @@ autocmd("BufReadPost", {
   end,
 })
 
+-- When opening a directory (e.g. `nvim /some/folder`), show dashboard + neo-tree sidebar
+augroup("DashboardOnDir", { clear = true })
+autocmd("VimEnter", {
+  group = "DashboardOnDir",
+  nested = true,
+  callback = function()
+    if vim.fn.argc() == 1 then
+      local arg = vim.fn.argv(0)
+      if vim.fn.isdirectory(arg) == 1 then
+        vim.schedule(function()
+          pcall(vim.api.nvim_buf_delete, vim.api.nvim_get_current_buf(), { force = true })
+          vim.fn.chdir(arg)
+          vim.cmd("Alpha")
+          vim.cmd("Neotree show")
+        end)
+      end
+    end
+  end,
+})
+
 -- Trim trailing whitespace on save
 augroup("TrimWhitespace", { clear = true })
 autocmd("BufWritePre", {
