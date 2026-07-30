@@ -21,8 +21,6 @@ spell/
 Thumbs.db
 Desktop.ini
 
-# ── Local dashboard layout tweaks ──────────────────────
-lua/plugins/dashboard.lua
 
 # ── Debug / repro ──────────────────────────────────────
 .repro/

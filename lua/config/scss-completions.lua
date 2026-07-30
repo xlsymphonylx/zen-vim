@@ -177,6 +177,7 @@ end
 ---   import './styles.scss'
 ---   import styles from './styles.module.scss'
 ---   import './styles.css'
+---   import '@/pages/foo/Foo.scss'  (@ alias resolved via vite/tsconfig)
 local function parse_tsx_imports(filepath)
   local lines = vim.fn.readfile(filepath)
   if not lines or #lines == 0 then return {} end
@@ -185,20 +186,41 @@ local function parse_tsx_imports(filepath)
   local seen = {}
   local dir = vim.fn.fnamemodify(filepath, ":h")
 
+  -- Find project root (for @/ alias resolution)
+  local project_root = nil
+  local check_dir = dir
+  while check_dir and check_dir ~= "/" do
+    if vim.fn.filereadable(check_dir .. "/vite.config.ts") == 1
+      or vim.fn.filereadable(check_dir .. "/vite.config.js") == 1
+      or vim.fn.filereadable(check_dir .. "/package.json") == 1 then
+      project_root = check_dir
+      break
+    end
+    check_dir = vim.fn.fnamemodify(check_dir, ":h")
+  end
+
   for _, line in ipairs(lines) do
     local path
 
-    -- import './foo.scss' or import "./foo.scss" (bare import, no `from`)
-    path = line:match("^%s*import%s+['\"]([^'\"]+%.s?c?[sa][cs][cs]?)['\"]%s*$")
+    -- import './foo.scss' or import "./foo.scss"
+    path = line:match("^%s*import%s+['\"]([^'\"]+%.s?c?[sa][cs][cs]?)['\"]%s*;?%s*$")
     if not path then
-      -- import x from './foo.scss' or import { x } from './foo.scss'
+      -- import x from './foo.scss'
       path = line:match("^%s*import%s+.+%s+from%s+['\"]([^'\"]+%.s?c?[sa][cs][cs]?)['\"]")
     end
 
-    -- Skip npm package imports (starting with ~ or @ or a bare name)
-    if path and not path:match("^[~@]") and not path:match("^[%w_][%w_%-]*/") then
-      local resolved = vim.fn.resolve(dir .. "/" .. path)
-      if vim.fn.filereadable(resolved) == 1 and not seen[resolved] then
+    if path then
+      local resolved
+
+      if path:match("^@/") and project_root then
+        -- @/ alias → resolve relative to project_root/src/
+        resolved = vim.fn.simplify(project_root .. "/src/" .. path:sub(3))
+      elseif not path:match("^[~]") and not path:match("^[%w_][%w_%-]*/") then
+        -- Relative path: resolve against the file's directory
+        resolved = vim.fn.simplify(dir .. "/" .. path)
+      end
+
+      if resolved and vim.fn.filereadable(resolved) == 1 and not seen[resolved] then
         seen[resolved] = true
         table.insert(result, resolved)
       end

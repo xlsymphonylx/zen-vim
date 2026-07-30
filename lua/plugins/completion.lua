@@ -68,11 +68,15 @@ return {
         ["<C-e>"] = { "cancel" },
       },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "scss-classes" },
+        default = { "lsp", "path", "snippets", "buffer", "scss-classes", "bem-completions" },
         providers = {
           ["scss-classes"] = {
             name = "scss-classes",
             module = "config.scss-completions",
+          },
+          ["bem-completions"] = {
+            name = "bem-completions",
+            module = "config.bem-completions",
           },
         },
       },
