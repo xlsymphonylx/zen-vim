@@ -37,15 +37,27 @@ return {
     local v = vim.version()
     dashboard.section.footer.val = "  v" .. v.major .. "." .. v.minor .. "." .. v.patch
 
-    -- ── Override theme layout for tight spacing ──
-    -- Default has padding:2 + global margin:5 — we gut that
+    -- ── Dynamic vertical centering ──
+    -- Calculates top padding so the whole section is centered in the window.
+    -- Works on both laptop and big-ass screens.
+    local HEADER_LINES = 13
+    local BUTTON_COUNT = 7
+    local BETWEEN_PADDING = 2    -- 1 before buttons + 1 after header
+    local CONTENT_HEIGHT = HEADER_LINES + BUTTON_COUNT + BETWEEN_PADDING + 1 -- +1 for footer
+
+    local function top_padding()
+      local win_height = vim.fn.winheight(0)
+      local pad = math.floor((win_height - CONTENT_HEIGHT) / 2)
+      return math.max(1, pad)
+    end
+
     dashboard.config.opts.margin = 0
     dashboard.config.layout = {
+      { type = "padding", val = top_padding },
       dashboard.section.header,
       { type = "padding", val = 1 },
       dashboard.section.buttons,
       dashboard.section.footer,
-      { type = "padding", val = 2 },
     }
 
     alpha.setup(dashboard.config)
