@@ -40,10 +40,14 @@ return {
     -- ── Dynamic vertical centering ──
     -- Calculates top padding so the whole section is centered in the window.
     -- Works on both laptop and big-ass screens.
+    -- Each button renders 2 rows (button + the group's 1-line spacing), so
+    -- the buttons section is BUTTON_COUNT * 2 rows tall.
     local HEADER_LINES = 13
     local BUTTON_COUNT = 7
-    local BETWEEN_PADDING = 2    -- 1 before buttons + 1 after header
-    local CONTENT_HEIGHT = HEADER_LINES + BUTTON_COUNT + BETWEEN_PADDING + 1 -- +1 for footer
+    local BUTTON_SPACING = 1     -- dashboard theme group opts.spacing
+    local BETWEEN_PADDING = 1    -- padding element between header and buttons
+    local FOOTER_LINES = 1
+    local CONTENT_HEIGHT = HEADER_LINES + BETWEEN_PADDING + BUTTON_COUNT * (1 + BUTTON_SPACING) + FOOTER_LINES
 
     local function top_padding()
       local win_height = vim.fn.winheight(0)
