@@ -23,7 +23,6 @@ return {
     local float_term = require("toggleterm.terminal").Terminal:new({
       cmd = vim.o.shell,
       direction = "float",
-      id = "floating",
       float_opts = {
         border = "rounded",
         width = 120,
